@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Trophy, MapPin, Calendar, Award } from "lucide-react";
+import Image from "next/image";
+import { PixelStar } from "./pixel-decorations";
 
 interface Hackathon {
   year: string;
@@ -72,7 +73,7 @@ const hackathons: Hackathon[] = [
     year: "2024",
     name: "AI社交产品黑客松",
     organizer: "Bondee",
-    award: "一等奖 🥇",
+    award: "一等奖",
     highlight: true,
     description: "AI 社交产品创新赛，从需求洞察到产品原型全流程，夺得最高奖项。",
   },
@@ -94,30 +95,42 @@ export default function Hackathons() {
     <section id="hackathons" className="py-20 md:py-28 bg-[#fdfbf7]">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section header */}
-        <div className="mb-16">
-          <h2 className="font-display text-4xl md:text-5xl text-[#2b2b2b] tracking-tight mb-4">
-            Hackathons
-          </h2>
-          <p className="text-[#666] text-lg">
-            7 次作为组长带队获奖，累计奖金 ¥20,000+
-          </p>
+        <div className="mb-16 flex items-start gap-6">
+          <div className="hidden md:block w-16 h-16 relative shrink-0">
+            <Image
+              src="/images/px-trophy.png"
+              alt="Trophy"
+              width={64}
+              height={64}
+              className="pixel-art"
+              unoptimized
+            />
+          </div>
+          <div>
+            <h2 className="font-display text-4xl md:text-5xl text-[#2b2b2b] tracking-tight mb-4">
+              Hackathons
+            </h2>
+            <p className="text-[#666] text-lg">
+              7 次作为组长带队获奖，累计奖金 ¥20,000+
+            </p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-[280px_1fr] gap-8 md:gap-12">
-          {/* Left: Timeline stepper */}
+          {/* Left: Timeline stepper — pixel style */}
           <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-4 md:pb-0">
             {hackathons.map((h, i) => (
               <button
                 key={i}
                 onClick={() => setActiveIndex(i)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-left whitespace-nowrap md:whitespace-normal transition-all duration-200 min-w-fit ${
+                className={`flex items-center gap-3 px-4 py-3 text-left whitespace-nowrap md:whitespace-normal transition-all duration-200 min-w-fit border-2 ${
                   i === activeIndex
-                    ? "bg-[#D97757]/[0.08] border border-[#D97757]/20"
-                    : "hover:bg-[#2b2b2b]/[0.03] border border-transparent"
+                    ? "bg-[#D97757]/[0.06] border-[#D97757]/30"
+                    : "hover:bg-[#2b2b2b]/[0.02] border-transparent"
                 }`}
               >
                 <span
-                  className={`font-display text-2xl tabular-nums ${
+                  className={`font-pixel text-lg tabular-nums ${
                     i === activeIndex ? "text-[#D97757]" : "text-[#ccc]"
                   }`}
                 >
@@ -131,18 +144,24 @@ export default function Hackathons() {
                   >
                     {h.name}
                   </p>
-                  <p className="text-xs text-[#bbb]">{h.year}</p>
+                  <p className="text-xs text-[#bbb] font-pixel">{h.year}</p>
                 </div>
               </button>
             ))}
           </div>
 
-          {/* Right: Detail card */}
-          <div className="bg-white rounded-2xl border border-[#e8e4de] p-8 md:p-10 shadow-sm">
+          {/* Right: Detail card — pixel style */}
+          <div className="bg-white border-2 border-[#e8e4de] p-8 md:p-10 shadow-[4px_4px_0_0_rgba(217,119,87,0.06)] relative">
+            {/* Corner decorations */}
+            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#D97757]/30" />
+            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#D97757]/30" />
+            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#D97757]/30" />
+            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#D97757]/30" />
+
             {/* Award badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#D97757]/[0.08] border border-[#D97757]/20 mb-6">
-              <Trophy size={14} className="text-[#D97757]" />
-              <span className="text-sm font-medium text-[#D97757]">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 border-2 border-[#D97757]/20 bg-[#D97757]/[0.06] mb-6">
+              <PixelStar size={14} color="#D97757" />
+              <span className="text-sm font-pixel text-[#D97757]">
                 {active.award}
               </span>
             </div>
@@ -151,21 +170,16 @@ export default function Hackathons() {
               {active.name}
             </h3>
 
-            {/* Meta info */}
+            {/* Meta info — pixel style */}
             <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-[#666]">
-              <span className="flex items-center gap-1.5">
-                <Calendar size={14} className="text-[#999]" />
-                {active.year}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Award size={14} className="text-[#999]" />
-                {active.organizer}
-              </span>
+              <span className="font-pixel text-xs">{active.year}</span>
+              <span className="text-[#ddd]">|</span>
+              <span>{active.organizer}</span>
               {active.location && (
-                <span className="flex items-center gap-1.5">
-                  <MapPin size={14} className="text-[#999]" />
-                  {active.location}
-                </span>
+                <>
+                  <span className="text-[#ddd]">|</span>
+                  <span>{active.location}</span>
+                </>
               )}
             </div>
 
@@ -174,24 +188,24 @@ export default function Hackathons() {
             </p>
 
             {active.project && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2b2b2b]/[0.04] border border-[#e8e4de] text-sm">
-                <span className="text-[#999]">Related project:</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#2b2b2b]/[0.03] border-2 border-[#e8e4de] text-sm">
+                <span className="font-pixel text-[10px] text-[#999]">PROJECT:</span>
                 <span className="font-medium text-[#2b2b2b]">
                   {active.project}
                 </span>
               </div>
             )}
 
-            {/* Progress dots */}
-            <div className="flex items-center gap-1.5 mt-8 pt-6 border-t border-[#e8e4de]">
+            {/* Progress dots — pixel style */}
+            <div className="flex items-center gap-1.5 mt-8 pt-6 border-t-2 border-[#e8e4de]">
               {hackathons.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveIndex(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                  className={`transition-all duration-300 ${
                     i === activeIndex
-                      ? "w-8 bg-[#D97757]"
-                      : "w-1.5 bg-[#ddd] hover:bg-[#bbb]"
+                      ? "w-6 h-2 bg-[#D97757]"
+                      : "w-2 h-2 bg-[#ddd] hover:bg-[#bbb]"
                   }`}
                 />
               ))}

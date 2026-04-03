@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
 
 const navLinks = [
   { label: "About", href: "#about" },
@@ -11,6 +10,35 @@ const navLinks = [
   { label: "Products", href: "#products" },
   { label: "AIGC", href: "#aigc" },
 ];
+
+function PixelHamburger({ open }: { open: boolean }) {
+  if (open) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 7 7">
+        <rect x="0" y="0" width="1" height="1" fill="currentColor" />
+        <rect x="6" y="0" width="1" height="1" fill="currentColor" />
+        <rect x="1" y="1" width="1" height="1" fill="currentColor" />
+        <rect x="5" y="1" width="1" height="1" fill="currentColor" />
+        <rect x="2" y="2" width="1" height="1" fill="currentColor" />
+        <rect x="4" y="2" width="1" height="1" fill="currentColor" />
+        <rect x="3" y="3" width="1" height="1" fill="currentColor" />
+        <rect x="2" y="4" width="1" height="1" fill="currentColor" />
+        <rect x="4" y="4" width="1" height="1" fill="currentColor" />
+        <rect x="1" y="5" width="1" height="1" fill="currentColor" />
+        <rect x="5" y="5" width="1" height="1" fill="currentColor" />
+        <rect x="0" y="6" width="1" height="1" fill="currentColor" />
+        <rect x="6" y="6" width="1" height="1" fill="currentColor" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="20" height="20" viewBox="0 0 7 5">
+      <rect x="0" y="0" width="7" height="1" fill="currentColor" />
+      <rect x="0" y="2" width="7" height="1" fill="currentColor" />
+      <rect x="0" y="4" width="7" height="1" fill="currentColor" />
+    </svg>
+  );
+}
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -26,14 +54,14 @@ export default function Header() {
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#f9f6f1]/80 backdrop-blur-md border-b border-[#e8e4de]/60 shadow-sm"
+          ? "bg-[#f9f6f1]/80 backdrop-blur-md border-b-2 border-[#e8e4de] shadow-sm"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
-        {/* Logo */}
+        {/* Logo — pixel style */}
         <a href="#about" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-[#D97757] flex items-center justify-center text-white font-bold text-sm">
+          <div className="w-8 h-8 bg-[#D97757] flex items-center justify-center text-white font-pixel text-sm">
             J
           </div>
           <span className="font-display text-xl text-[#2b2b2b] group-hover:text-[#D97757] transition-colors">
@@ -64,10 +92,9 @@ export default function Header() {
           >
             GitHub
           </a>
-
           <a
             href="mailto:jayden@inflowx.ai"
-            className="px-5 py-2 rounded-full bg-[#D97757] text-white text-sm font-medium hover:bg-[#c4603f] transition-colors"
+            className="px-5 py-2 bg-[#D97757] text-white text-sm font-pixel hover:bg-[#c4603f] transition-colors"
           >
             Contact
           </a>
@@ -78,19 +105,19 @@ export default function Header() {
           onClick={() => setMobileOpen(!mobileOpen)}
           className="md:hidden p-2 text-[#2b2b2b]/70"
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          <PixelHamburger open={mobileOpen} />
         </button>
       </div>
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden absolute top-16 left-4 right-4 bg-[#fdfbf7] rounded-2xl shadow-lg border border-[#e8e4de] p-3">
+        <div className="md:hidden absolute top-16 left-4 right-4 bg-[#fdfbf7] shadow-lg border-2 border-[#e8e4de] p-3">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="block px-4 py-2.5 text-sm font-medium text-[#2b2b2b]/70 hover:text-[#D97757] hover:bg-[#D97757]/5 rounded-xl transition-colors"
+              className="block px-4 py-2.5 text-sm font-medium text-[#2b2b2b]/70 hover:text-[#D97757] hover:bg-[#D97757]/5 transition-colors"
             >
               {link.label}
             </a>
