@@ -6,7 +6,8 @@ import Hackathons from "@/components/hackathons";
 import Products from "@/components/products";
 import AigcGallery from "@/components/aigc-gallery";
 import Footer from "@/components/footer";
-import { PixelDivider, PixelSceneDivider } from "@/components/pixel-decorations";
+import ParallaxClouds from "@/components/parallax-clouds";
+import { PixelDivider } from "@/components/pixel-decorations";
 
 export default function Home() {
   return (
@@ -16,9 +17,9 @@ export default function Home() {
         <Hero />
         <PixelDivider />
         <LiveDashboard />
-        <PixelDivider />
+        <ParallaxClouds />
         <Projects />
-        <PixelSceneDivider />
+        <PixelDivider />
         <Hackathons />
         <PixelDivider />
         <Products />

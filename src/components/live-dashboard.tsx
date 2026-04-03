@@ -1,23 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
-
-function generateHeatmapData(weeks: number) {
-  const data: number[][] = [];
-  for (let w = 0; w < weeks; w++) {
-    const week: number[] = [];
-    for (let d = 0; d < 7; d++) {
-      const rand = Math.random();
-      if (rand < 0.15) week.push(0);
-      else if (rand < 0.35) week.push(1);
-      else if (rand < 0.6) week.push(2);
-      else if (rand < 0.8) week.push(3);
-      else week.push(4);
-    }
-    data.push(week);
-  }
-  return data;
-}
+import { useEffect, useState } from "react";
 
 const tokenColors = [
   "bg-[#f0ece6]",
@@ -51,7 +34,7 @@ function Heatmap({
           {week.map((val, di) => (
             <div
               key={di}
-              className={`w-[11px] h-[11px] ${colors[val]} heatmap-cell`}
+              className={`w-[11px] h-[11px] ${colors[val] || colors[0]} heatmap-cell`}
               title={`${label}: Level ${val}`}
             />
           ))}
@@ -61,7 +44,6 @@ function Heatmap({
   );
 }
 
-/* Pixel art chart icon */
 function PixelChart({ color }: { color: string }) {
   return (
     <svg width="28" height="28" viewBox="0 0 8 8">
@@ -73,9 +55,27 @@ function PixelChart({ color }: { color: string }) {
   );
 }
 
+interface GithubData {
+  publicRepos: number;
+  yearContributions: number;
+  heatmap: number[][];
+}
+
 export default function LiveDashboard() {
-  const tokenData = useMemo(() => generateHeatmapData(20), []);
-  const githubData = useMemo(() => generateHeatmapData(20), []);
+  const [githubData, setGithubData] = useState<GithubData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/github")
+      .then((res) => res.json())
+      .then((data) => {
+        setGithubData(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const emptyHeatmap = Array.from({ length: 20 }, () => Array(7).fill(0));
 
   return (
     <section id="dashboard" className="py-20 md:py-28">
@@ -93,9 +93,9 @@ export default function LiveDashboard() {
           </p>
         </div>
 
-        {/* Two cards — pixel style */}
+        {/* Two cards */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Token Usage Card */}
+          {/* Token Usage Card — Tokscale embed */}
           <div className="bg-[#fdfbf7] border-2 border-[#e8e4de] p-6 pixel-card">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -113,31 +113,41 @@ export default function LiveDashboard() {
                   <h3 className="text-sm font-semibold text-[#2b2b2b]">
                     AI Token Usage
                   </h3>
-                  <p className="text-xs text-[#999] font-pixel">Last 20 weeks</p>
+                  <p className="text-xs text-[#999] font-pixel">via Tokscale</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-[#D97757] font-mono">
-                  2.4M
-                </p>
-                <p className="text-xs text-[#999]">tokens / month</p>
-              </div>
             </div>
-            <div className="overflow-x-auto pb-2">
-              <Heatmap data={tokenData} colors={tokenColors} label="Token usage" />
-            </div>
-            <div className="flex items-center gap-4 mt-4 text-xs text-[#999]">
-              <span className="font-pixel">Less</span>
-              <div className="flex gap-1">
-                {tokenColors.map((c, i) => (
-                  <div key={i} className={`w-[11px] h-[11px] ${c}`} />
-                ))}
+            {/* Tokscale SVG embed */}
+            <div className="w-full overflow-hidden rounded">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://tokscale.ai/api/embed/jayden72huang/svg?theme=light&compact=1"
+                alt="Token usage from Tokscale"
+                className="w-full h-auto"
+                loading="lazy"
+                onError={(e) => {
+                  // If embed fails, show placeholder
+                  const target = e.currentTarget;
+                  target.style.display = "none";
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = "flex";
+                }}
+              />
+              <div className="hidden flex-col items-center justify-center py-8 text-center">
+                <p className="font-pixel text-xs text-[#999] mb-2">TOKEN DATA</p>
+                <a
+                  href="https://tokscale.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-[#D97757] hover:underline"
+                >
+                  View on Tokscale →
+                </a>
               </div>
-              <span className="font-pixel">More</span>
             </div>
           </div>
 
-          {/* GitHub Activity Card */}
+          {/* GitHub Activity Card — Real data */}
           <div className="bg-[#fdfbf7] border-2 border-[#e8e4de] p-6 pixel-card">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -155,41 +165,68 @@ export default function LiveDashboard() {
                   <h3 className="text-sm font-semibold text-[#2b2b2b]">
                     GitHub Contributions
                   </h3>
-                  <p className="text-xs text-[#999] font-pixel">Last 20 weeks</p>
+                  <p className="text-xs text-[#999] font-pixel">
+                    {loading ? "loading..." : "real-time"}
+                  </p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold text-[#2d6a1e] font-mono">
-                  847
+                  {loading ? "—" : githubData?.yearContributions || 0}
                 </p>
                 <p className="text-xs text-[#999]">this year</p>
               </div>
             </div>
             <div className="overflow-x-auto pb-2">
-              <Heatmap data={githubData} colors={githubColors} label="GitHub" />
+              {loading ? (
+                <div className="flex items-center justify-center h-20">
+                  <p className="font-pixel text-xs text-[#999] animate-blink">
+                    FETCHING DATA...
+                  </p>
+                </div>
+              ) : (
+                <Heatmap
+                  data={githubData?.heatmap || emptyHeatmap}
+                  colors={githubColors}
+                  label="GitHub"
+                />
+              )}
             </div>
-            <div className="flex items-center gap-4 mt-4 text-xs text-[#999]">
-              <span className="font-pixel">Less</span>
-              <div className="flex gap-1">
-                {githubColors.map((c, i) => (
-                  <div key={i} className={`w-[11px] h-[11px] ${c}`} />
-                ))}
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-4 text-xs text-[#999]">
+                <span className="font-pixel">Less</span>
+                <div className="flex gap-1">
+                  {githubColors.map((c, i) => (
+                    <div key={i} className={`w-[11px] h-[11px] ${c}`} />
+                  ))}
+                </div>
+                <span className="font-pixel">More</span>
               </div>
-              <span className="font-pixel">More</span>
+              <a
+                href="https://github.com/Jayden72Huang"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-pixel text-[10px] text-[#D97757] hover:underline"
+              >
+                @Jayden72Huang
+              </a>
             </div>
           </div>
         </div>
 
-        {/* Stats row — pixel style */}
+        {/* Stats row — real data */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           {[
-            { label: "Repos", value: "28", sub: "on GitHub" },
-            { label: "Products", value: "6+", sub: "shipped" },
-            { label: "Hackathons", value: "7x", sub: "winning" },
-            { label: "Prize", value: "¥20K+", sub: "累计奖金" },
-          ].map((stat) => (
+            {
+              value: loading ? "—" : String(githubData?.publicRepos || 12),
+              sub: "on GitHub",
+            },
+            { value: "6+", sub: "shipped" },
+            { value: "7x", sub: "winning" },
+            { value: "¥20K+", sub: "累计奖金" },
+          ].map((stat, i) => (
             <div
-              key={stat.label}
+              key={i}
               className="bg-[#fdfbf7] border-2 border-[#e8e4de] p-4 text-center hover:border-[#D97757]/40 transition-colors"
             >
               <p className="text-2xl font-bold text-[#2b2b2b] font-mono">
