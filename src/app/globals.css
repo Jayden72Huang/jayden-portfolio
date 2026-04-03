@@ -1,26 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core palette */
+  --background: #f9f6f1;
+  --background-paper: #fdfbf7;
+  --foreground: #2b2b2b;
+  --foreground-muted: #666666;
+  --foreground-faint: #999999;
+
+  /* Claude orange */
+  --accent: #D97757;
+  --accent-light: #e8956e;
+  --accent-dark: #c4603f;
+  --accent-bg: rgba(217, 119, 87, 0.08);
+  --accent-bg-hover: rgba(217, 119, 87, 0.14);
+
+  /* Borders */
+  --border: #e8e4de;
+  --border-strong: #d4cfc7;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(43, 43, 43, 0.04);
+  --shadow-md: 0 4px 12px rgba(43, 43, 43, 0.06);
+  --shadow-lg: 0 8px 30px rgba(43, 43, 43, 0.08);
+
+  /* Radius */
+  --radius: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-paper: var(--background-paper);
   --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-faint: var(--foreground-faint);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-bg: var(--accent-bg);
+  --color-accent-bg-hover: var(--accent-bg-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: 'Instrument Serif', serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f0ece6;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4cfc7;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b2a8;
+}
+
+/* Selection */
+::selection {
+  background: rgba(217, 119, 87, 0.2);
+  color: #2b2b2b;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Instrument Serif utility */
+.font-display {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+}
+
+/* Contribution heatmap cell */
+.heatmap-cell {
+  transition: all 0.15s ease;
+}
+.heatmap-cell:hover {
+  transform: scale(1.8);
+  outline: 1px solid var(--accent);
+  z-index: 10;
+  position: relative;
+}
+
+/* Animated gradient border */
+@keyframes border-rotate {
+  from { --angle: 0deg; }
+  to { --angle: 360deg; }
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Fade in up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Stagger children */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
