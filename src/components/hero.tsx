@@ -142,56 +142,40 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right: Pixel art scene */}
+          {/* Right: Pixel art hero illustration */}
           <div className="relative">
-            <div className="relative bg-[#fdfbf7] border-2 border-[#e8e4de] p-6 md:p-8 shadow-[4px_4px_0_0_rgba(217,119,87,0.1)]">
+            <div className="relative bg-[#fdfbf7] border-2 border-[#e8e4de] p-3 shadow-[4px_4px_0_0_rgba(217,119,87,0.1)]">
               {/* Terminal header */}
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-2 mb-3 px-2 pt-1">
                 <div className="w-3 h-3 bg-[#D97757]" />
                 <div className="w-3 h-3 bg-[#f5c542]" />
                 <div className="w-3 h-3 bg-[#6abf69]" />
                 <span className="ml-3 font-pixel text-[10px] text-[#999]">
-                  jayden.config.ts
+                  jayden.workspace
                 </span>
               </div>
 
-              {/* Pixel art computer illustration */}
-              <div className="flex items-center justify-center mb-6">
+              {/* Hero pixel art image */}
+              <div className="relative aspect-[16/9] overflow-hidden">
                 <Image
-                  src="/images/px-computer.png"
-                  alt="Pixel art computer"
-                  width={120}
-                  height={120}
-                  className="pixel-art animate-float-slow"
+                  src="/images/hero-pixel.png"
+                  alt="Pixel art of Jayden coding with AI robot assistants in a cozy workspace"
+                  fill
+                  className="object-cover pixel-art"
+                  priority
                   unoptimized
                 />
               </div>
 
-              {/* Code block — pixel mono style */}
-              <div className="font-mono text-sm leading-7 text-[#2b2b2b]">
-                <div>
-                  <span className="text-[#D97757]">const</span>{" "}
-                  <span className="text-[#2b2b2b]">jayden</span>{" "}
-                  <span className="text-[#999]">=</span>{" "}
-                  <span className="text-[#999]">{"{"}</span>
-                </div>
-                <div className="pl-4">
-                  <span className="text-[#666]">role:</span>{" "}
-                  <span className="text-[#D97757]">&quot;AI Agent Builder&quot;</span>
-                  <span className="text-[#999]">,</span>
-                </div>
-                <div className="pl-4">
-                  <span className="text-[#666]">ships:</span>{" "}
-                  <span className="text-[#2b2b2b]">true</span>
-                  <span className="text-[#999]">,</span>
-                </div>
-                <div className="pl-4">
-                  <span className="text-[#666]">motto:</span>{" "}
-                  <span className="text-[#D97757]">&quot;Code {'>'} Slides&quot;</span>
-                </div>
-                <div>
-                  <span className="text-[#999]">{"}"}</span>
-                  <span className="animate-blink text-[#D97757]">|</span>
+              {/* Caption bar */}
+              <div className="mt-2 px-2 pb-1 flex items-center justify-between">
+                <span className="font-pixel text-[10px] text-[#999]">
+                  const jayden = {"{"} ships: true {"}"}
+                </span>
+                <div className="flex gap-1">
+                  <PixelStar size={10} color="#D97757" />
+                  <PixelStar size={10} color="#e8956e" />
+                  <PixelStar size={10} color="#f5c542" />
                 </div>
               </div>
             </div>
