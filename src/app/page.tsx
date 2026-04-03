@@ -6,18 +6,20 @@ import Hackathons from "@/components/hackathons";
 import Products from "@/components/products";
 import AigcGallery from "@/components/aigc-gallery";
 import Footer from "@/components/footer";
-import ParallaxClouds from "@/components/parallax-clouds";
+import ParallaxLayer from "@/components/parallax-clouds";
 import { PixelDivider } from "@/components/pixel-decorations";
 
 export default function Home() {
   return (
     <>
       <Header />
-      <main>
+      {/* Global parallax layer — floating pixel art elements throughout the page */}
+      <ParallaxLayer />
+      <main className="relative z-[2]">
         <Hero />
         <PixelDivider />
         <LiveDashboard />
-        <ParallaxClouds />
+        <PixelDivider />
         <Projects />
         <PixelDivider />
         <Hackathons />

@@ -1,129 +1,209 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 
-export default function ParallaxClouds() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+/**
+ * Global scroll-driven parallax layer.
+ * Large pixel art elements float throughout the entire page at different speeds.
+ * Positioned fixed and driven by scroll position — not confined to one section.
+ */
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
+interface FloatingElement {
+  id: string;
+  src: string;
+  width: number;
+  height: number;
+  // Position anchors (% of page height for Y, viewport edge for X)
+  startY: number; // When this element starts being visible (px from top)
+  endY: number;   // When it leaves
+  // X position
+  side: "left" | "right";
+  xOffset: number; // % from edge
+  // Parallax
+  speed: number; // 0.1 = slow, 1 = normal scroll speed
+  // Opacity
+  opacity: number;
+}
 
-    const onScroll = () => {
-      const rect = section.getBoundingClientRect();
-      const windowH = window.innerHeight;
-      // progress 0 = section just entering viewport, 1 = fully scrolled past
-      const raw = 1 - rect.bottom / (windowH + rect.height);
-      setProgress(Math.max(0, Math.min(1, raw)));
-    };
+const elements: FloatingElement[] = [
+  // Cloud drifting near Hero → Dashboard transition
+  {
+    id: "cloud-hero-left",
+    src: "/images/cloud-left.png",
+    width: 380,
+    height: 280,
+    startY: 200,
+    endY: 1200,
+    side: "left",
+    xOffset: -8,
+    speed: 0.3,
+    opacity: 0.55,
+  },
+  // Cloud on right near Dashboard
+  {
+    id: "cloud-dash-right",
+    src: "/images/cloud-right.png",
+    width: 320,
+    height: 240,
+    startY: 600,
+    endY: 1800,
+    side: "right",
+    xOffset: -5,
+    speed: 0.2,
+    opacity: 0.45,
+  },
+  // Robot floating near Projects
+  {
+    id: "robot-projects",
+    src: "/images/px-robot.png",
+    width: 100,
+    height: 100,
+    startY: 1800,
+    endY: 3200,
+    side: "right",
+    xOffset: 5,
+    speed: 0.15,
+    opacity: 0.35,
+  },
+  // Large cloud near Hackathons
+  {
+    id: "cloud-hack-left",
+    src: "/images/cloud-left.png",
+    width: 350,
+    height: 260,
+    startY: 3000,
+    endY: 4500,
+    side: "left",
+    xOffset: -10,
+    speed: 0.25,
+    opacity: 0.4,
+  },
+  // Rocket floating near Products
+  {
+    id: "rocket-products",
+    src: "/images/px-rocket.png",
+    width: 80,
+    height: 80,
+    startY: 4000,
+    endY: 5500,
+    side: "left",
+    xOffset: 8,
+    speed: 0.1,
+    opacity: 0.3,
+  },
+  // Cloud on right near AIGC
+  {
+    id: "cloud-aigc-right",
+    src: "/images/cloud-right.png",
+    width: 300,
+    height: 220,
+    startY: 5000,
+    endY: 6500,
+    side: "right",
+    xOffset: -8,
+    speed: 0.2,
+    opacity: 0.5,
+  },
+  // Sparkle floating midpage
+  {
+    id: "sparkle-mid",
+    src: "/images/px-sparkle.png",
+    width: 70,
+    height: 70,
+    startY: 2200,
+    endY: 3500,
+    side: "left",
+    xOffset: 15,
+    speed: 0.08,
+    opacity: 0.25,
+  },
+  // Trophy floating near hackathons
+  {
+    id: "trophy-hack",
+    src: "/images/px-trophy.png",
+    width: 90,
+    height: 90,
+    startY: 3400,
+    endY: 4800,
+    side: "right",
+    xOffset: 10,
+    speed: 0.12,
+    opacity: 0.25,
+  },
+];
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+export default function ParallaxLayer() {
+  const [scrollY, setScrollY] = useState(0);
+  const rafRef = useRef<number>(0);
+
+  const handleScroll = useCallback(() => {
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      setScrollY(window.scrollY);
+    });
   }, []);
 
-  // Cloud positions driven by scroll progress
-  const leftX = -60 + progress * 110; // from -60% to +50%
-  const rightX = 60 - progress * 110; // from +60% to -50%
-  const cloudOpacity = Math.min(1, progress * 2.5);
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [handleScroll]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full h-[420px] md:h-[500px] overflow-hidden bg-[#2b2b2b] flex items-center justify-center"
-    >
-      {/* Left cloud */}
-      <div
-        className="absolute left-0 top-1/2 -translate-y-1/2 w-[300px] md:w-[450px] h-[220px] md:h-[320px] transition-none"
-        style={{
-          transform: `translateX(${leftX}%) translateY(-50%)`,
-          opacity: cloudOpacity,
-        }}
-      >
-        <Image
-          src="/images/cloud-left.png"
-          alt=""
-          fill
-          className="object-contain pixel-art"
-          unoptimized
-        />
-        {/* Fallback CSS cloud */}
-        <div className="absolute inset-0 -z-10 flex items-center justify-center">
-          <svg width="100%" height="100%" viewBox="0 0 20 12" className="opacity-20">
-            <rect x="6" y="0" width="8" height="2" fill="#e8e4de" />
-            <rect x="4" y="2" width="12" height="2" fill="#e8e4de" />
-            <rect x="2" y="4" width="16" height="2" fill="#d4cfc7" />
-            <rect x="0" y="6" width="20" height="2" fill="#e8e4de" />
-            <rect x="1" y="8" width="18" height="2" fill="#d4cfc7" />
-            <rect x="3" y="10" width="14" height="2" fill="#e8e4de" />
-          </svg>
-        </div>
-      </div>
+    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+      {elements.map((el) => {
+        // Calculate if element is in visible range
+        const viewportH = typeof window !== "undefined" ? window.innerHeight : 900;
+        const elementCenter = (el.startY + el.endY) / 2;
+        const range = el.endY - el.startY;
 
-      {/* Right cloud */}
-      <div
-        className="absolute right-0 top-1/2 -translate-y-1/2 w-[280px] md:w-[400px] h-[200px] md:h-[300px] transition-none"
-        style={{
-          transform: `translateX(${rightX}%) translateY(-50%)`,
-          opacity: cloudOpacity,
-        }}
-      >
-        <Image
-          src="/images/cloud-right.png"
-          alt=""
-          fill
-          className="object-contain pixel-art"
-          unoptimized
-        />
-        <div className="absolute inset-0 -z-10 flex items-center justify-center">
-          <svg width="100%" height="100%" viewBox="0 0 18 10" className="opacity-20">
-            <rect x="4" y="0" width="10" height="2" fill="#e8e4de" />
-            <rect x="2" y="2" width="14" height="2" fill="#d4cfc7" />
-            <rect x="0" y="4" width="18" height="2" fill="#e8e4de" />
-            <rect x="1" y="6" width="16" height="2" fill="#d4cfc7" />
-            <rect x="3" y="8" width="12" height="2" fill="#e8e4de" />
-          </svg>
-        </div>
-      </div>
+        // Progress: how far through the element's scroll range we are
+        const progress = Math.max(
+          0,
+          Math.min(1, (scrollY - el.startY + viewportH) / (range + viewportH))
+        );
 
-      {/* Floating pixel stars in the dark section */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[15%] left-[30%] animate-sparkle" style={{ animationDelay: "0s" }}>
-          <svg width="8" height="8" viewBox="0 0 3 3">
-            <rect x="1" y="0" width="1" height="1" fill="#D97757" />
-            <rect x="0" y="1" width="3" height="1" fill="#D97757" />
-            <rect x="1" y="2" width="1" height="1" fill="#D97757" />
-          </svg>
-        </div>
-        <div className="absolute top-[70%] right-[25%] animate-sparkle" style={{ animationDelay: "1s" }}>
-          <svg width="6" height="6" viewBox="0 0 3 3">
-            <rect x="1" y="0" width="1" height="1" fill="#e8956e" />
-            <rect x="0" y="1" width="3" height="1" fill="#e8956e" />
-            <rect x="1" y="2" width="1" height="1" fill="#e8956e" />
-          </svg>
-        </div>
-        <div className="absolute top-[25%] right-[40%] animate-sparkle" style={{ animationDelay: "2s" }}>
-          <svg width="5" height="5" viewBox="0 0 3 3">
-            <rect x="1" y="0" width="1" height="1" fill="#f5c542" />
-            <rect x="0" y="1" width="3" height="1" fill="#f5c542" />
-            <rect x="1" y="2" width="1" height="1" fill="#f5c542" />
-          </svg>
-        </div>
-      </div>
+        // Only render if in range
+        const isVisible = scrollY + viewportH > el.startY && scrollY < el.endY;
+        if (!isVisible) return null;
 
-      {/* Center text */}
-      <div className="relative z-10 text-center px-6 max-w-2xl">
-        <h2 className="font-display text-4xl md:text-6xl text-white tracking-tight mb-4">
-          Building for <em className="text-[#D97757]">everyone.</em>
-        </h2>
-        <p className="text-base md:text-lg text-white/60 leading-relaxed">
-          For creators. For builders. For people who just want things done.
-          <br className="hidden md:block" />
-          For productivity. And for fun.
-        </p>
-      </div>
-    </section>
+        // Parallax Y offset: element moves slower than scroll
+        const parallaxY = elementCenter - scrollY * (1 - el.speed) - viewportH * 0.3;
+
+        // Fade in/out at edges
+        const fadeIn = Math.min(1, progress * 4);
+        const fadeOut = Math.min(1, (1 - progress) * 4);
+        const opacity = el.opacity * fadeIn * fadeOut;
+
+        const style: React.CSSProperties = {
+          position: "absolute",
+          top: parallaxY,
+          ...(el.side === "left"
+            ? { left: `${el.xOffset}%` }
+            : { right: `${el.xOffset}%` }),
+          width: el.width,
+          height: el.height,
+          opacity,
+          transition: "none",
+          willChange: "transform",
+        };
+
+        return (
+          <div key={el.id} style={style}>
+            <Image
+              src={el.src}
+              alt=""
+              fill
+              className="object-contain pixel-art"
+              unoptimized
+            />
+          </div>
+        );
+      })}
+    </div>
   );
 }
